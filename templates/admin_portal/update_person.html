@@ -1,0 +1,78 @@
+{% extends 'includes/master.html' %}
+{% load static %}
+{% block body %}
+<div class="page-title-box">
+    <div class="row align-items-center">
+        <div class="col-sm-6">
+            <h4 class="page-title"><i class="fas fa-edit"></i> Person</h4>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-right">
+                <li class="breadcrumb-item"><a href="javascript:void(0);">AutoExpert</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0);">Forms</a></li>
+                <li class="breadcrumb-item active">Update Person</li>
+            </ol>
+        </div>
+    </div> <!-- end row -->
+</div>
+<!-- end page-title -->
+
+<div class="row">
+    <div class="col-lg-2"></div>
+    <div class="col-lg-8">
+        <div class="card m-b-30">
+            <div class="card-body">
+                <form class="form-horizontal" action="{% url 'update_person' pk=person.id %}" onsubmit="return validate()" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div id="alertDiv" class="alert {% if message.tags %}alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}{{ message.tags }}{% endif %}{% endif %}"role="alert">{{ message }}</div>                        {% endfor %}
+                    {% endif %}
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" class="form-control" name="name" value='{{person.name}}' required placeholder="Enter Name" />
+                    </div>
+                    <div class="form-group">
+                        <label>Contact</label>
+                        <input type="tel" class="form-control" name="contact" pattern="[0-9]{4}-[0-9]{7}" placeholder="03xx-xxxxxxx" required value="{{person.contact}}" />
+                    </div>
+                    <div class="form-group">
+                        <label>Address</label>
+                        <input type="text" value='{{person.address}}' class="form-control" name="address" required />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="type">Type</label>
+                        <select name="type" value="{{ person.type }}" id="type" class="form-control"
+                            required>
+                            <option value="">Select Brand</option>
+                            <option value="0" {% if person.type == 0 %} selected="selected" {% endif %}>Vendor</option>
+                            <option value="1" {% if person.type == 1 %} selected="selected" {% endif %}>Customer</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            <button type="submit" class="btn btn-primary waves-effect waves-light">
+                                Submit
+                            </button>
+                            <button type="reset" class="btn btn-secondary waves-effect m-l-5">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div> <!-- end col -->
+    <div class="col-lg-2"></div>
+
+    {% endblock %}
+
+
+    {% block js %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#alertDiv').delay(3000).slideUp(1200);
+        });
+    </script>
+    {% endblock %}

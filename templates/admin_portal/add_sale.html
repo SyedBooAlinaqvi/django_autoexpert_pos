@@ -1,0 +1,482 @@
+{% extends 'includes/master.html' %}
+{% load static %}
+{% block body %}
+<div class="page-title-box">
+    <div class="row align-items-center">
+        <div class="col-sm-6">
+            <h4 class="page-title"><i class="fas fa-plus-circle"></i> Add Sale</h4>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-right">
+                <li class="breadcrumb-item"><a href="javascript:void(0);">AutoExpert</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0);">Forms</a></li>
+                <li class="breadcrumb-item active">Add Sale</li>
+            </ol>
+        </div>
+    </div> <!-- end row -->
+</div>
+<!-- end page-title -->
+    <form action="{% url 'add_sale' %}" method="post" id="mainForm">
+        {% csrf_token %}
+        {% if messages %}
+        {% for message in messages %}
+        <div id="alertDiv"
+            class="alert {% if message.tags %}alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}{{ message.tags }}{% endif %}{% endif %}"
+            role="alert">{{ message }}</div> {% endfor %}
+        {% endif %}
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card m-b-30">
+                    <div class="card-body">
+                        <div id="sale_form" class="form-group" data-service-url="{% url 'load_service_price' %}"
+                            data-products-url="{% url 'load_products_price' %}"
+                            data-quantity-url="{% url 'load_products_quantity' %}">
+                            {% comment %} <div> {% endcomment %}
+                                <h4 class="mt-0 header-title">Sale Register</h4>
+                                <input name="index" id="index" type='hidden' value="0" />
+                                <div class="row">
+                                    <div class="col-lg-6 form-group">
+                                        <label for="name">Customer Name</label>
+                                        <input class="form-control" name="person_name" id="person_name" type="text" >
+                                    </div>
+                                    <div class="col-lg-6 form-group">
+                                        <label for="contact">Contact No.</label>
+                                        <input class="form-control" pattern="[0-9]{4}-[0-9]{7}" placeholder="03xx-xxxxxxx" id="phone_no" name="phone_no" type="tel" >
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4 form-group">
+                                        <label for="vehicle">Vehicle Name</label>
+                                        <input class="form-control" name="vehicle_name" id="vehicle_name" type="text">
+                                    </div>
+                                    <div class="col-lg-4 form-group">
+                                        <label for="model">Vehicle Model</label>
+                                        <input class="form-control" id="vehicle_model" name="vehicle_model" type="text" >
+                                    </div>
+                                    <div class="col-lg-4 form-group">
+                                        <label for="vehicle_no">Vehicle Number</label>
+                                        <input class="form-control" id="vehicle_no" type="text" >
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6 form-group">
+                                        <div id='dropdown1'>
+                                            <label for="ProductId">Products</label>
+                                            <select id="selectproducts" value="0" class="form-control"
+                                                name="selectproducts">
+                                                <option id="option">SelectProducts</option>
+                                                {% for product in products %}
+                                                <option value="{{product.id}}">{{product.name}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 form-group">
+                                        <div id='dropdown2'>
+                                            <label for="ServiceId">Services</label>
+                                            <select id="selectservices" value="0" class="form-control"
+                                                name="selectservices">
+                                                <option id="option2">SelectServices</option>
+                                                {% for service in services %}
+                                                <option value="{{service.id}}">{{service.name}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4 form-group">
+                                        <label for="Stock">Stock</label>
+                                        <input class="form-control" name="stocks" id="stocks" type="number" disabled>
+                                    </div>
+                                    <div class="col-lg-4 form-group">
+                                        <label for="Quantity">Quantity</label>
+                                        <input class="form-control" id="Quantity" name="quanity" type="number" min="0"
+                                            max="" value="0" Required>
+                                    </div>
+                                    <div class="col-lg-4 form-group">
+                                        <label for="Price">Price</label>
+                                        <input class="form-control" id="purchase_pricee" type="number" disabled>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <button type="button" id="addRow"
+                                            class="btn btn-success waves-effect waves-light">
+                                            Add to List <span class="mdi mdi-cart-plus "></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card m-b-30 mt-2">
+                        <div class="card-body">
+                            <h4 class="mt-0 header-title">Selected Items</h4>
+                            <table class="table table-bordered dt-responsive nowrap">
+                                <thead>
+                                    <tr>
+                                        <th>Items</th>
+                                        <th>Type</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Total</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="tblProducts">
+                                </tbody>
+                            </table>
+                            {% comment %} <div class="form-group">
+                                <div>
+                                    <button type="button" id='summary' class="btn btn-success waves-effect waves-light">
+                                        Generate Summary
+                                    </button>
+                                </div>
+                            </div> {% endcomment %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <center>
+                                <h4>Current Bill</h4>
+                            </center>
+                            <hr style="border-top: 1px solid">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <h6>Service Cost</h6>
+                                </div>
+                                <div class="col-sm-8 mt-2">
+                                    <input type="number" value="0.00" name="service_cost" id="service_cost" disabled>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <h6>Sales Cost</h6>
+                                </div>
+                                <div class="col-sm-8 mt-2">
+                                    <input type="number" value="0.00" name="sales_cost" id="sales_cost" disabled>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4 ">
+                                    <h6>Total</h6>
+                                </div>
+                                <div class="col-sm-8 mt-2">
+                                    <input type="number" value="0.00" name="total" id="total" disabled>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <label for="discount">
+                                        <h6>Discount</h6>
+                                    </label>
+                                </div>
+                                <div class="col-sm-8 mt-2">
+                                    <input type="number" min='0' value="0.00" name="discount" id="discount">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <label for="NetAmount">
+                                        <h6>Net Amount</h6>
+                                    </label>
+                                </div>
+                                <div class="col-sm-8 mt-2">
+                                    <input type="number" min='0' value="0.00" name="net_amount" id="net_amount" disabled>
+                                </div>
+                            </div>
+                            <hr style="border-top: 1px dashed">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <label for="Recieved">
+                                        <h6>Received</h6>
+                                    </label>
+                                </div>
+                                <div class="col-sm-8 mt-2">
+                                    <input type="number" min='0' value="0.00" name="recieved" id="recieved">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <label for="discount">
+                                        <h6>Paid</h6>
+                                    </label>
+                                </div>
+                                <div class="col-sm-8 mt-2">
+                                    <input type="number" min='0' value="0.00" name="paid" id="paid">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <label for="Balance">
+                                        <h6>Balance</h6>
+                                    </label>
+                                </div>
+                                <div class="col-sm-8 mt-2">
+                                    <input type="number" min='0' value="0.00" name="balance" id="balance">
+                                </div>
+                            </div>
+                            
+                            
+                            <hr style="border-top: 1px dashed">
+                            <div class="form-group mt-5">
+                                <div>
+                                    <button type="submit" class="btn btn-success waves-effect waves-light float-right">
+                                        Save
+                                    </button>
+                                     <button type="button" class="btn btn-primary waves-effect waves-light float-right mr-1" id="sendInvoice">
+                                        Print
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </form>
+
+    <form id="saleForm" action="" method="get">
+    </form>
+
+{% endblock %}
+
+{% block js %}
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="{% static '/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static '/plugins/datatables/dataTables.bootstrap4.min.js' %}"></script>
+<script>
+$('#sendInvoice').hide()
+    var products_names = []
+    var services_names = []
+    var products = []
+    var services = []
+    var qty = []
+    var sqty = []
+    var stock = []
+    var total_product_price = []
+    var stotal_product_price = []
+    var rate = []
+    var srate = []
+    var sales_cost = []
+    var total_price = 0
+    var total_qty = 0
+    var sum = 0
+
+    $("#selectservices").change(function () {
+        var serviceId = $(this).val();
+        var url3 = $("#sale_form").attr("data-service-url");
+        $.ajax({
+            url: url3,
+            data: {
+                'service': serviceId
+            },
+            success: function (data) {
+                $("#purchase_pricee").val(data);
+                $("#Quantity").val("1");
+                $("#Quantity").attr('disabled',"disabled");
+                $("#stocks").val("0");
+                $("#selectproducts").val('0')
+            }
+        });
+    });
+    $("#selectproducts").change(function () {
+        var productId = $(this).val();
+        var url = $("#sale_form").attr("data-products-url");
+        var url2 = $("#sale_form").attr("data-quantity-url");
+        var t_stock = $('#Quantity').attr('max');
+        $.ajax({
+            url: url,
+            data: {
+                'product': productId
+            },
+            success: function (data) {
+                $("#selectservices").val('0')
+                $("#Quantity").val("1");
+                $("#Quantity").removeAttr('disabled');
+                $("#purchase_pricee").val(data);
+            }
+        });
+        $.ajax({
+            url: url2,
+            data: {
+                'product': productId
+            },
+            success: function (data) {
+                $("#stocks").val(data);
+                $('#Quantity').attr({ 'max': data });
+            }
+        });
+    });
+
+    $("#mainForm").submit(function (e) {
+        e.preventDefault()
+        var action = $(this).attr('action');
+        var form = new FormData()
+        var cash = $('#paid').val()
+        var purcahse_date = $('#purcahse_date').val()
+        var discount = $('#discount').val()
+        var total = $('#total').val()
+        var sale_amount = $('#sales_cost').val()
+        var maintenance_cost = $('#service_cost').val()
+        var person_name = $('#person_name').val()
+        var phone_no = $('#phone_no').val()
+        var vehicle_name = $('#vehicle_name').val()
+        var vehicle_model = $('#vehicle_model').val()
+        var vehicle_no = $('#vehicle_no').val()
+        var net_amount = $('#net_amount').val()
+
+        
+        $.post(action, { 'products': products, 'services': services, 'qty': qty, 'rate': rate, 'sale_amount': parseFloat(sale_amount), 'maintenance_cost': parseFloat(maintenance_cost) , 'total_price': parseFloat(total), 'total_qty': total_qty, 'cash': parseFloat(cash),  'net_amount': parseFloat(net_amount) ,'total_product_price': total_product_price ,  'stotal_product_price': stotal_product_price, 'sqty': sqty, 'srate': srate, 'discount': discount,'person_name':person_name,'phone_no':phone_no,'vehicle_name':vehicle_name,'vehicle_model':vehicle_model,'vehicle_no':vehicle_no, }).then((result) => {
+            console.log(result);
+            if (!result.error){
+                $('#saleForm').attr('action', '/admin_portal/invoice/'+result.sale_id)
+                setTimeout(()=> {
+                    $('#sendInvoice').show()
+                }, 500)
+            }
+        }).fail((error) => {
+            console.log(error);
+        });
+    });
+    $('#sendInvoice').click(function(){
+         $('#saleForm').submit()
+    })
+    $('#addRow').on('click', function () {
+        var temp = $('#pName').val();
+        var t = $('.tblProducts');
+        var index = $('#index').val();
+        var product_id = $('#selectproducts').val()
+        var service_id = $('#selectservices').val()
+        var matched = false
+        var product_name = $('#selectproducts option:selected').text()
+        var service_name = $('#selectservices option:selected').text()
+        var product_qty = $('#Quantity').val()
+        var product_price = $('#purchase_pricee').val()
+        
+        if(product_id != 'SelectProducts'){
+            products.forEach((item, index) => {
+                if (item == product_id) {
+                    total_product_price[index] += parseFloat(product_qty * product_price)
+                    qty[index] = parseInt(product_qty) + parseInt(qty[index])
+                    matched = true
+                }
+            })
+            if (!matched) {
+                products_names.push(product_name)
+                products.push(product_id)
+                qty.push(product_qty)
+                total_product_price.push(product_qty * product_price)
+                rate.push(product_price)
+            }
+                t.html('')
+                addList(t)
+            
+        }else if(service_id != 'SelectServices'){
+            services.forEach((item, index) => {
+                if (item == service_id) {
+                    //stotal_product_price[index] += parseFloat(product_qty * product_price)
+                    //sqty[index] = parseInt(product_qty) + parseInt(qty[index])
+                    matched = true
+                }
+            })
+            if (!matched) {
+                services_names.push(service_name)
+                services.push(service_id)
+                sqty.push(product_qty)
+                stotal_product_price.push(product_qty * product_price)
+                srate.push(product_price)
+            }
+                t.html('')
+                addList(t)
+        }
+        var total = 0;
+        var totalproducts = 0;
+        var totalservices = 0;
+        var totalQuantity = 0;
+        var count = 0;
+        total_product_price.forEach(item => {
+            total += parseFloat(item)
+            $("#sales_cost").val(total);
+        })
+        stotal_product_price.forEach(item => {
+            totalservices += parseFloat(item);
+            total += parseFloat(item);
+            $("#service_cost").val(totalservices);
+        })
+        qty.forEach(item => {
+            totalQuantity += parseInt(item)
+        })
+        sqty.forEach(item => {
+            totalQuantity += parseInt(item)
+        })
+        total_qty = totalQuantity
+        total_price = total
+        
+
+        
+        $("#total").val(total);
+        $("#net_amount").val(total);
+        $("#paid").val(total);
+        $("#itemss").val(totalQuantity);
+        $("#t_product").val(products.length);
+    });
+    function addList(t) {
+        products.forEach((item, index) => {
+            t.append("<tr> <td><input type='hidden' class='txtname' name='products[]' value='" + item + "' />" + products_names[index] + "</td>"
+                +
+                " <td><input type='hidden' class='type' name='type[]' value=''/>Product</td>"
+                +
+                 " <td><input type='hidden' class='txtprice' name='price[]' value='" + rate[index] + "'/>" + rate[index] + "</td>"
+                +
+                " <td><input type='hidden' class='txtquantity' name='quantities[]' value='" + qty[index] + "'/>" + qty[index] + "</td>"
+                +
+                " <td><input type='hidden' class='totalquantity' id='subTotal' name='subTotal[]' value='" + total_product_price[index] + "'/>" + total_product_price[index] + "</td>"
+                +
+                " <td><button type='button' class='btn btn-air-warning btn-sm' style = 'border-radius : 30px''><i class='fa fa-trash fa-lg'></i></button></td></tr>");
+        })
+        services.forEach((item, index) => {
+            t.append("<tr> <td><input type='hidden' class='txtname' name='services[]' value='" + item + "' />" + services_names[index] + "</td>"
+                +
+                " <td><input type='hidden' class='type' name='type[]' value=''/>Service</td>"
+                +
+                 " <td><input type='hidden' class='txtprice' name='sprice[]' value='" + srate[index] + "'/>" + srate[index] + "</td>"
+                +
+                " <td><input type='hidden' class='txtquantity' name='squantities[]' value='" + sqty[index] + "'/>" + sqty[index] + "</td>"
+                +
+                " <td><input type='hidden' class='totalquantity' id='subTotal' name='ssubTotal[]' value='" + stotal_product_price[index] + "'/>" + stotal_product_price[index] + "</td>"
+                +
+                " <td><button type='button' class='btn btn-air-warning btn-sm' style = 'border-radius : 30px''><i class='fa fa-trash fa-lg'></i></button></td></tr>");
+        })
+    }
+    
+    $("#discount").on('keyup', function () {
+        if ($.trim(this.value).length) {
+            var net_amount = parseFloat($("#total").val()).toFixed(2) -
+                parseFloat($("#discount").val()).toFixed(2);
+            $('#net_amount').val(net_amount);
+            $('#paid').val(net_amount);
+        }
+    });
+    $('#recieved').on('keyup', function () {
+        if ($.trim(this.value).length) {
+            var balance = parseFloat($('#recieved').val()).toFixed(2) -
+                parseFloat($('#paid').val()).toFixed(2);
+            $('#balance').val(balance);
+        }
+    })
+
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#alertDiv').delay(3000).slideUp(1200);
+    });
+</script>
+
+
+
+
+{% endblock %}

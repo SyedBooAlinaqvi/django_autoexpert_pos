@@ -1,0 +1,177 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+        <title>AutoExpert</title>
+        <meta content="Responsive admin theme build on top of Bootstrap 4" name="description" />
+        <meta content="Themesdesign" name="author" />
+        <link rel="shortcut icon" href="{% static '/images/favicon.png' %}">
+        <link href="{% static '/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static '/css/metismenu.min.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static '/css/icons.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static '/css/style.css' %}" rel="stylesheet" type="text/css">
+
+    </head>
+
+<body>
+    <div class="page">
+        <!-- Start content -->
+        <div class="content">
+            <div class="container">
+                <div class="page-title-box">
+                    <div class="row align-items-center">
+                        <div class="col-sm-6">
+                        </div>
+                        
+                    </div> <!-- end row -->
+                </div>
+                <!-- end page-title -->
+
+                <div class="row mr-2">
+                    <div class="col-6">
+                        <div class="card m-b-30">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="invoice-title">
+                                        <center class="">
+                                            <h3 class="m-t-0">
+                                                <img src="{% static '/images/logo-dark.png' %}" alt="logo" height="40"/>
+                                            </h3>
+                                        </center>
+                                        </div>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <address>
+                                                    <strong>Address:</strong><br>
+                                                    Main Sialkot Bypass <br>
+                                                    Road, <br>
+                                                    Usman Town,<br>
+                                                    Gujranwala<br>
+                                                </address>
+                                            </div>
+                                            <div class="col-6 text-right">
+                                                <address class="mr-5">
+                                                    <strong>Contact:</strong><br>
+                                                    +92-305-4269-695 <br>
+                                                    +92-322-5542-014 <br>
+                                                </address>
+                                                <address class="mr-5">
+                                                    <strong>Date:</strong><br>
+                                                    <p id="date"></p>
+                                                </address>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="panel panel-default">
+                                            <div class="p-2">
+                                                <h3 class="panel-title font-20"><strong>Order summary</strong></h3>
+                                            </div>
+                                            <div class="">
+                                                <div class="table-responsive">
+                                                    <table id="mytable" class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <td><strong>Sr.no</strong></td>
+                                                                <td><strong>Item/Service</strong></td>
+                                                                <td class="text-center"><strong>Quantity</strong></td>
+                                                                <td class="text-center"><strong>Price</strong></td>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <!-- foreach ($order->lineItems as $line) or some such thing here -->
+                                                            {% for saledetail in details %}
+                                                            <tr>
+                                                                <td>{{ forloop.counter }}</td>
+                                                                {% if saledetail.service.name %}
+                                                                <td>{{ saledetail.service.name }}</td>
+                                                                {% else %}
+                                                                <td>{{ saledetail.product.name }}</td>
+                                                                {% endif %} 
+                                                                <td class="text-center">{{ saledetail.quantity }}</td>
+                                                                <td class="text-center">{{ saledetail.rate }}</td>
+                                                            </tr>
+                                                            {% endfor %}
+                                                            <tr>
+                                                                <td class="no-line"></td>
+                                                                <td class="no-line"></td>
+                                                                <td class="thick-line text-center">
+                                                                    <strong>Total</strong>
+                                                                </td>
+                                                                <td class="no-line text-right">
+                                                                    <h4 class="text-center m-0">{{ sale.total_amount }}</h4>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                    <hr>
+                                                </div>
+
+                                                <div class="d-print-none mo-mt-5"><br>
+                                                    <div class="float-right mr-4">
+                                                        <a href="javascript:window.print()"
+                                                            class="btn btn-success waves-effect waves-light"><i class="fa fa-print"></i>
+                                                        </a>
+                                                    </div>
+                                                </div><br><br>
+                                                <center>
+                                                <h4>
+                                                    Thankyou for shopping! 
+                                                </h4>
+                                                </center>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div> <!-- end row -->
+
+                            </div>
+                        </div>
+                    </div> <!-- end col -->
+                    <div class="col-6"></div>
+
+                </div> <!-- end row -->
+
+
+            </div>
+            <!-- container-fluid -->
+
+        </div>
+        <!-- content -->
+
+        
+
+    </div>
+
+        <script src="{% static '/js/jquery.min.js' %}"></script>
+        <script src="{% static '/js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static '/js/metismenu.min.js' %}"></script>
+        <script src="{% static '/js/jquery.slimscroll.js' %}"></script>
+        <script src="{% static '/js/waves.min.js' %}"></script>
+
+        <!-- App js -->
+        <script src="{% static '/js/app.js' %}"></script>
+        <script>
+    var m = new Date();
+    var dateString =
+    m.getUTCFullYear() + "/" +
+    ("0" + (m.getUTCMonth()+1)).slice(-2) + "/" +
+    ("0" + m.getUTCDate()).slice(-2) + " " 
+    //("0" + m.getUTCHours()).slice(-2) + ":" +
+    //("0" + m.getUTCMinutes()).slice(-2) + ":" +
+    //("0" + m.getUTCSeconds()).slice(-2);
+    
+    document.getElementById("date").innerHTML = dateString;
+</script>
+</body>
+
+</html>

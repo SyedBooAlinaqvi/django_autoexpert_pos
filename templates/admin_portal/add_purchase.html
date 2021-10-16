@@ -1,0 +1,286 @@
+{% extends 'includes/master.html' %}
+{% load static %}
+{% block body %}
+<div class="page-title-box">
+    <div class="row align-items-center">
+        <div class="col-sm-6">
+            <h4 class="page-title"><i class="fas fa-plus-circle"></i> Add Purchase</h4>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-right">
+                <li class="breadcrumb-item"><a href="javascript:void(0);">AutoExpert</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0);">Forms</a></li>
+                <li class="breadcrumb-item active">Add Purchase</li>
+            </ol>
+        </div>
+    </div> <!-- end row -->
+</div>
+<!-- end page-title -->
+
+
+<form action="{% url 'add_purchase' %}" method="post">
+    {% csrf_token %}
+    {% if messages %}
+    {% for message in messages %}
+    <div id="alertDiv"
+        class="alert {% if message.tags %}alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}{{ message.tags }}{% endif %}{% endif %}"
+        role="alert">{{ message }}</div> {% endfor %}
+    {% endif %}
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card m-b-30">
+                <div class="card-body">
+                    <div id="purchase_form" data-product-url="{% url 'load_product_by_id' %}">
+                        <div class="form-group">
+                            <div class="form-group">
+                                <label for="SupplierId">Vendor</label>
+                                <select name="vendor" id="selectsuppliers" class="form-control" required>
+                                    <option value="">Select Vendor</option>
+                                    {% for person in persons %}
+                                    <option value="{{person.id}}">{{person.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="ProductId">Product</label>
+                                <select name="product" id="selectproducts" class="form-control">
+                                    <option value="">Select Product</option>
+                                    {% for product in products %}
+                                    <option value="{{product.id}}">{{product.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-6">
+                                <label>Purchase Price</label>
+                                <input type="number" min="0" class="form-control" id="purchase_pricee"
+                                    name="purchase_price" required />
+                                {% comment %} load_product_by_id {% endcomment %}
+                            </div>
+                            <div class="col-md-6">
+                                <label>Quantity</label>
+                                <input type="number" min="1" class="form-control" id="Quantity" name="quantity"
+                                    required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div>
+                                <button type="button" id="addRow" class="btn btn-success waves-effect waves-light">
+                                    Add to List
+                                    <span class="mdi mdi-cart-plus "></span>
+                                </button>
+                                <button type="reset" class="btn btn-secondary waves-effect m-l-5">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h4 class="mb-3 header-title">Purchase Summary</h4>
+            <div class="card m-b-30">
+                <div class="card-body">
+                    
+                    <div class="form-group">
+                        <div class="form-group row">
+                            <div class="col-md-6">
+                                <label>Total Amount</label>
+                                <input type="number" min="0" id="t_amount" class="form-control"
+                                    name="total_amount" disabled />
+                            </div>
+                            <div class="col-md-6">
+                                <label>Total Product</label>
+                                <input type="number" min="1" id="t_product" class="form-control" name="total_product"
+                                    disabled />
+                               
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-6">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Total Quantity</label>
+                                <input type="number" min="1" id="t_quantity" class="form-control" name="total_quantity"
+                                    disabled />
+                                <span id="available_quantity"></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-6">
+                                <label>Cash</label>
+                                <input type="number" min="0" class="form-control" id="cash"
+                                    name="cash" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label>Purchase Date</label>
+                                <input type="date" min="1" class="form-control" id="purcahse_date" name="purcahse_date" required/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                        <div>
+                            <button type="submit" class="btn btn-primary waves-effect waves-light">
+                                Submit
+                            </button>
+                            <button type="reset" class="btn btn-secondary waves-effect m-l-5">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- end col -->
+        <div class="col-lg-6">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card m-b-30">
+                        <div class="card-body">
+                            <h4 class="mr-2 header-title">Selected Products</h4>
+                            <table id="mytable" class="table table-bordered dt-responsive nowrap ">
+                                <thead>
+                                    <tr>
+                                        <th>Products</th>
+                                        {% comment %} <th>Brand</th> {% endcomment %}
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>SubTotal</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="tblProducts">
+                                </tbody>
+                            </table>
+                            <div class="form-group">
+                                <div>
+                                    <button type="button" id="summary" class="btn btn-success waves-effect waves-light">
+                                        Generate Summary
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+
+    </div>
+</form>
+
+<!-- container-fluid -->
+
+
+{% endblock %}
+
+
+{% block js %}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#alertDiv').delay(3000).slideUp(1200);
+    });
+</script>
+
+{% comment %} dependent drop down {% endcomment %}
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="{% static '/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static '/plugins/datatables/dataTables.bootstrap4.min.js' %}"></script>
+    
+<script>
+    var products_names = []
+    var products = []
+    var qty = []
+    var total_product_price = []
+    var rate = []
+    var brands = []
+    var total_price = 0
+    var total_qty = 0
+    $("#selectproducts").change(function () {
+        var productId = $(this).val();
+        var url = $("#purchase_form").attr("data-product-url");
+        $.ajax({
+            url: url,
+            data: {
+                'product': productId
+            },
+            success: function (data) {
+                $("#purchase_pricee").val(data);
+            }
+        });
+    });
+    $("form").submit(function (e) {
+        e.preventDefault()
+        var action = $(this).attr('action');
+        var form = new FormData()
+        var cash = $('#cash').val()
+        var purcahse_date = $('#purcahse_date').val()
+        var supplier = $('#selectsuppliers').val()
+        
+        $.post(action, {'products': products, 'qty': qty, 'rate': rate, 'total_price': total_price, 'total_qty': total_qty, 'cash': cash, 'purcahse_date': purcahse_date, 'supplier': supplier, 'total_product_price': total_product_price}).then((result)=> {
+            console.log(result);
+            location.reload();
+        }).fail((error)=> {
+            console.log(error);
+        })
+    });
+    $('#addRow').on('click', function () {
+        var temp = $('#pName').val();
+        var t = $('.tblProducts');
+        var index = $('#index').val();
+        var matched = false
+        products.forEach((item, index)=> {
+            if(item == $('#selectproducts').val()){
+                total_product_price[index] += parseFloat($('#Quantity').val() * $('#purchase_pricee').val())
+                qty[index] = parseInt($('#Quantity').val()) + parseInt(qty[index])
+                matched = true
+            }
+        })
+        if(!matched){
+            products_names.push($('#selectproducts option:selected').text())
+            products.push($('#selectproducts').val())
+            qty.push($('#Quantity').val())
+            total_product_price.push($('#Quantity').val() * $('#purchase_pricee').val())
+            rate.push($('#purchase_pricee').val())
+        }
+        
+        t.html('')
+        addList(t)
+       
+    });
+
+    function addList(t){
+         products.forEach((item, index)=> {
+            t.append("<tr> <td><input type='hidden' class='txtname' name='products[]' value='" + item + "' />" + products_names[index] + "</td>"
+            +
+            " <td><input type='hidden' class='txtprice' name='price[]' value='" + rate[index] + "'/>" + rate[index] + "</td>"
+            +
+            " <td><input type='hidden' class='txtquantity' name='quantities[]' value='" + qty[index] + "'/>" + qty[index] + "</td>"
+            +
+            " <td><input type='hidden' class='totalquantity' id='subTotal' name='subTotal[]' value='" + total_product_price[index] + "'/>" + total_product_price[index] + "</td>"
+            +
+            " <td><button type='button' class='btn btn-air-warning btn-sm' style = 'border-radius : 30px''><i class='fa fa-trash fa-lg'></i></button></td></tr>");
+        })
+    }
+    $('#summary').on('click', function() {
+        var total = 0;
+        var totalQuantity = 0;
+        var count = 0;
+        total_product_price.forEach(item=>{
+            total += parseFloat(item)
+        })
+        qty.forEach(item=>{
+            totalQuantity += parseInt(item)
+        })
+        total_qty = totalQuantity
+        total_price = total
+        $("#t_amount").val(total);
+        $("#t_quantity").val(totalQuantity);
+        $("#t_product").val(products.length);
+    });
+    
+
+</script>
+{% endblock %}
+
