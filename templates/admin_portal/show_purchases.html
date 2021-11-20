@@ -43,6 +43,7 @@
                             <th>Total Amount</th>
                             <th>Paid Amount</th>
                             <th>Date</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -53,6 +54,13 @@
                             <td>{{ purchase.total_amount }}</td>
                             <td>{{ purchase.paid_amount }}</td>
                             <td>{{ purchase.date }}</td>
+                            <td>
+                            <div style="text-align: center;">
+                                <a href="{% url 'del_purchase' id=purchase.id %}" class="btn btn-outline-danger btn-sm waves-effect waves-light" style="width: 30px;">
+                                    <i class="fa fa-trash fa-lg"></i>
+                                </a>
+                            </div>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>

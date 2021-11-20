@@ -83,3 +83,4 @@ class StockOutLog(models.Model):
     product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='product_stock')
     quantity = models.IntegerField()
     date = models.DateField(auto_now_add=True)
+    type = models.CharField(max_length=255)

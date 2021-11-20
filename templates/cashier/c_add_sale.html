@@ -1,8 +1,5 @@
 {% extends 'includes/master.html' %}
 {% load static %}
-{% block css %}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-{% endblock %}
 {% block body %}
 <div class="page-title-box">
     <div class="row align-items-center">
@@ -19,7 +16,7 @@
     </div> <!-- end row -->
 </div>
 <!-- end page-title -->
-    <form action="{% url 'add_sale' %}" method="post" id="mainForm">
+    <form action="{% url 'c_add_sale' %}" method="post" id="mainForm">
         {% csrf_token %}
         {% if messages %}
         {% for message in messages %}
@@ -62,7 +59,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-lg-6 form-group mt-1">
+                                    <div class="col-lg-6 form-group">
                                         <div id='dropdown1'>
                                             <label for="ProductId">Products</label>
                                             <select id="selectproducts" value="0" class="form-control"
@@ -247,12 +244,8 @@
 {% endblock %}
 
 {% block js %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script>
-    $(document).ready(function() { $('#selectproducts').select2();  });
-</script>
-{% comment %} <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script> {% endcomment %}
-{% comment %} <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script> {% endcomment %}
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script src="{% static '/plugins/datatables/jquery.dataTables.min.js' %}"></script>
 <script src="{% static '/plugins/datatables/dataTables.bootstrap4.min.js' %}"></script>
 <script>
@@ -290,6 +283,7 @@ $('#sendInvoice').hide()
             }
         });
     });
+
     $("#selectproducts").change(function () {
         var productId = $(this).val();
         var url = $("#sale_form").attr("data-products-url");
@@ -351,7 +345,8 @@ $('#sendInvoice').hide()
     });
     $('#sendInvoice').click(function(){
          $('#saleForm').submit()
-    })
+    });
+
     $('#addRow').on('click', function () {
         var temp = $('#pName').val();
         var t = $('.tblProducts');
@@ -363,7 +358,8 @@ $('#sendInvoice').hide()
         var service_name = $('#selectservices option:selected').text()
         var product_qty = $('#Quantity').val()
         var product_price = $('#purchase_pricee').val()
-        if(product_id != 'SelectProducts' && product_id != null){
+        
+        if(product_id != 'SelectProducts'){
             products.forEach((item, index) => {
                 if (item == product_id) {
                     total_product_price[index] += parseFloat(product_qty * product_price)
@@ -378,9 +374,10 @@ $('#sendInvoice').hide()
                 total_product_price.push(product_qty * product_price)
                 rate.push(product_price)
             }
+                t.html('')
                 addList(t)
             
-        }else if(service_id != 'SelectServices' && service_id != null){
+        }else if(service_id != 'SelectServices'){
             services.forEach((item, index) => {
                 if (item == service_id) {
                     //stotal_product_price[index] += parseFloat(product_qty * product_price)
@@ -395,12 +392,10 @@ $('#sendInvoice').hide()
                 stotal_product_price.push(product_qty * product_price)
                 srate.push(product_price)
             }
+                t.html('')
                 addList(t)
         }
-       generateSummary()
-    });
-    function generateSummary(){
-         var total = 0;
+        var total = 0;
         var totalproducts = 0;
         var totalservices = 0;
         var totalQuantity = 0;
@@ -423,16 +418,16 @@ $('#sendInvoice').hide()
         total_qty = totalQuantity
         total_price = total
         
+
+        
         $("#total").val(total);
         $("#net_amount").val(total);
         $("#paid").val(total);
         $("#itemss").val(totalQuantity);
         $("#t_product").val(products.length);
-    }
+    });
 
     function addList(t) {
-        t.html('')
-
         products.forEach((item, index) => {
             t.append("<tr> <td><input type='hidden' class='txtname' name='products[]' value='" + item + "' />" + products_names[index] + "</td>"
                 +
@@ -444,45 +439,21 @@ $('#sendInvoice').hide()
                 +
                 " <td><input type='hidden' class='totalquantity' id='subTotal' name='subTotal[]' value='" + total_product_price[index] + "'/>" + total_product_price[index] + "</td>"
                 +
-                " <td><button type='button' class='btn btn-air-warning btn-sm del1' data-index='"+index+"' style='border-radius : 30px''><i class='fa fa-trash fa-lg'></i></button></td></tr>");
+                " <td><button type='button' class='btn btn-air-warning btn-sm' style = 'border-radius : 30px''><i class='fa fa-trash fa-lg'></i></button></td></tr>");
         })
         services.forEach((item, index) => {
             t.append("<tr> <td><input type='hidden' class='txtname' name='services[]' value='" + item + "' />" + services_names[index] + "</td>"
                 +
                 " <td><input type='hidden' class='type' name='type[]' value=''/>Service</td>"
                 +
-                 " <td><input type='hidden' class='txtprice' name='sprice[]' value='" + srate[index] + "'/>" + srate[index] + "</td>"
+                " <td><input type='hidden' class='txtprice' name='sprice[]' value='" + srate[index] + "'/>" + srate[index] + "</td>"
                 +
                 " <td><input type='hidden' class='txtquantity' name='squantities[]' value='" + sqty[index] + "'/>" + sqty[index] + "</td>"
                 +
                 " <td><input type='hidden' class='totalquantity' id='subTotal' name='ssubTotal[]' value='" + stotal_product_price[index] + "'/>" + stotal_product_price[index] + "</td>"
                 +
-                " <td><button type='button' class='btn btn-air-warning btn-sm del' data-index='"+index+"' style='border-radius : 30px''><i class='fa fa-trash fa-lg'></i></button></td></tr>");
-        });
-    $('.del').on('click', function () {
-            var index = $(this).data('index')
-            services_names.splice(index, 1)
-            services.splice(index, 1)
-            sqty.splice(index, 1)
-            stotal_product_price.splice(index, 1)
-            srate.splice(index, 1)
-            var t = $('.tblProducts');  
-            addList(t)
-            generateSummary()
-
-        });
-    $('.del1').on('click', function () {
-            var index = $(this).data('index')
-            products_names.splice(index, 1)
-            products.splice(index, 1)
-            qty.splice(index, 1)
-            total_product_price.splice(index, 1)
-            rate.splice(index, 1)
-            var t = $('.tblProducts');  
-            addList(t)
-            generateSummary()
-
-        });
+                " <td><button type='button' class='btn btn-air-warning btn-sm' style = 'border-radius : 30px''><i class='fa fa-trash fa-lg'></i></button></td></tr>");
+        })
     }
     
     $("#discount").on('keyup', function () {
@@ -493,13 +464,14 @@ $('#sendInvoice').hide()
             $('#paid').val(net_amount);
         }
     });
+    
     $('#recieved').on('keyup', function () {
         if ($.trim(this.value).length) {
             var balance = parseFloat($('#recieved').val()).toFixed(2) -
                 parseFloat($('#paid').val()).toFixed(2);
             $('#balance').val(balance);
         }
-    })
+    });
 
 </script>
 <script type="text/javascript">

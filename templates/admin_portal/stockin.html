@@ -1,0 +1,72 @@
+{% extends 'includes/master.html' %}
+{% load static %}
+{% block body %}
+<div class="page-title-box">
+    <div class="row align-items-center">
+        <div class="col-sm-6">
+            <h4 class="page-title"><i class="fas fa-plus-circle"></i> StockIn</h4>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-right">
+                <li class="breadcrumb-item"><a href="javascript:void(0);">AutoExpert</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0);">Forms</a></li>
+                <li class="breadcrumb-item active">StockIn</li>
+            </ol>
+        </div>
+    </div> <!-- end row -->
+</div>
+<!-- end page-title -->
+
+<div class="row">
+    <div class="col-lg-2"></div>
+    <div class="col-lg-8">
+        <div class="card m-b-30">
+            <div class="card-body">
+                <form class="form-horizontal" action="{% url 'stockin' %}" onsubmit="return validate()" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div id="alertDiv" class="alert {% if message.tags %}alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}{{ message.tags }}{% endif %}{% endif %}"role="alert">{{ message }}</div>                        {% endfor %}
+                    {% endif %}
+                    <div class="form-group">
+                        <div id='dropdown2'>
+                            <label for="ProductsId">Products</label>
+                            <select id="selectproducts" value="0" class="form-control"
+                                name="selectproducts" required>
+                                <option id="option2">SelectProduct</option>
+                                {% for product in products %}
+                                <option value="{{product.id}}">{{product.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" min="0" class="form-control" name="quantity" required />
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            <button type="submit" class="btn btn-primary waves-effect waves-light">
+                                Submit
+                            </button>
+                            <button type="reset" class="btn btn-secondary waves-effect m-l-5">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div> <!-- end col -->
+    <div class="col-lg-2"></div>
+
+    {% endblock %}
+
+
+    {% block js %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#alertDiv').delay(3000).slideUp(1200);
+        });
+    </script>
+    {% endblock %}

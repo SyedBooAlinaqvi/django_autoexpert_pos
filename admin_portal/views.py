@@ -30,10 +30,10 @@ def login(request):
                 auth.login(request, user)
                 return redirect('show_services')
             else:
-                messages.error(request, 'Admin does not exist with this user name')
-                return redirect('login')
+                auth.login(request, user)
+                return redirect('c_show_services')
         else:
-            messages.error(request, 'INVALID CREDENTIALS')
+            messages.info(request, 'INVALID CREDENTIALS')
             return redirect('login')
     else:
         return render(request, 'admin_portal/login.html')
@@ -116,8 +116,6 @@ def add_product(request):
             product.save()
             stock = Stock(product_id=product.id,quantity=0)
             stock.save()
-            stockoutlog = StockOutLog(product_id=product.id,quantity=0)
-            stockoutlog.save()
             messages.success(request, 'Successfully Added the Product')
             return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
         return render(request, 'admin_portal/add_product.html')
@@ -239,6 +237,8 @@ def add_purchase(request):
                     if stock:
                         stock.quantity+=int(quantity[counter])
                         stock.save()
+                        stockoutlog = StockOutLog(type='stock in',product_id=product,quantity=int(quantity[counter]))
+                        stockoutlog.save()
                     else:
                         messages.error(request,"Firstly Add the Product in Database" )
                         return redirect('add_purchase')
@@ -259,81 +259,142 @@ def load_product_by_id(request):
     return HttpResponse(products.purchase_rate)
 
 @login_required
+def del_purchase(request,id):
+    purchase = Purchase.objects.get(id=id)
+    purchase.delete()
+    purchaseDetail = PurchaseDetails.objects.filter(purchase_id=id)
+    purchaseDetail.delete()
+    payment = Payment.objects.filter(purchase_id=id)
+    payment.delete()
+    messages.success(request,"Purchase Deleted Successfully. \n Remember to Stock Out the quantity against this Purchase!!")
+    return redirect('show_purchases')
+
+@login_required
+def stockout(request):
+    products = Product.objects.all()
+    if request.method == "POST":
+        product_id = request.POST.get('selectproducts')
+        quantity = request.POST.get('quantity')
+        if product_id:
+            stock = Stock.objects.filter(product_id=product_id).first()
+            stock.quantity-=int(quantity)
+            stock.save()
+            messages.success(request,"Quantity Subtracted from Stock Successfully!!")
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+        else:
+            messages.error(request,"First Select the Product!!")
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+    return render(request,'admin_portal/stockout.html',{'products':products})
+
+#------------------ Sales ---------------------#
+
+@login_required
 def show_sales(request):
-    sales = Sale.objects.all()
-    return render(request, 'admin_portal/show_sales.html',{'sales':sales})
+    if request.user.is_superuser:
+        sales = Sale.objects.all()
+        return render(request, 'admin_portal/show_sales.html',{'sales':sales})
+    else:
+        return HttpResponse('Not accessible')
     
 @login_required
 @csrf_exempt
 @transaction.atomic
 def add_sale(request):
-    products = Product.objects.all()
-    services = Service.objects.all()
-    persons = Person.objects.filter(type=1)
-    if request.method == 'POST':
-        try:
-            phone_no = request.POST.get('phone_no')
-            vehicle_name = request.POST.get('vehicle_name')
-            vehicle_model = request.POST.get('vehicle_model')
-            vehicle_no = request.POST.get('vehicle_no')
-            maintenance_cost = request.POST.get('maintenance_cost')
-            sale_amount = request.POST.get('sale_amount')
-            total_amount = request.POST.get('total_price')
-            discount = request.POST.get('discount')
-            final_amount = request.POST.get('net_amount')
-            paid = request.POST.get('cash') 
-            person_name = request.POST.get('person_name', None)
-            products = request.POST.getlist('products[]',None)
-            services = request.POST.getlist('services[]',None)
-            rate = request.POST.getlist('rate[]')
-            quantity = request.POST.getlist('qty[]')
-            total_product_price = request.POST.getlist('total_product_price[]')
-            srate = request.POST.getlist('srate[]')
-            squantity = request.POST.getlist('sqty[]')
-            stotal_product_price = request.POST.getlist('stotal_product_price[]')
-            # return JsonResponse({'body': request.POST}, safe=False)
-            sale = Sale(discount=discount, maintenance_cost=maintenance_cost, sale_amount=sale_amount, total_amount=total_amount,  final_amount=final_amount,phone_no=phone_no,vehicle_name=vehicle_name,vehicle_model=vehicle_model,vehicle_no=vehicle_no,customer_name=person_name, paid=paid,status=True,type='sale',description='customer')
-            sale.save()
-            payment1 = Payment(credit=0,debit=final_amount,date=sale.date,type='walking',description='sale cash out',sale_id=sale.pk, customer_name=person_name)
-            payment2 = Payment(credit=paid,debit=0,date=sale.date,type='walking',description='sale cash in',sale_id=sale.pk, customer_name=person_name)
-            payment1.save()
-            payment2.save()
-            
-            counter =  0
-            for product in products:
-                sale_detail_products = SaleDetails(sale_id=sale.pk, product_id=product, quantity=quantity[counter], rate=rate[counter])
-                sale_detail_products.save()
-                stock = Stock.objects.filter(product_id=product).first()
-                stockoutlog = StockOutLog.objects.filter(product_id=product).first()
-                if stock:
-                    stock.quantity-=int(quantity[counter])
-                    stock.save()
-                    stockoutlog.quantity+=int(quantity[counter])
-                    stockoutlog.save()
-                else:
-                    messages.error(request,"Firstly Add the Product in Database" )
-                    return redirect('add_sale')
-                counter += 1
+    if request.user.is_superuser:
+        products = Product.objects.all()
+        services = Service.objects.all()
+        persons = Person.objects.filter(type=1)
+        if request.method == 'POST':
+            try:
+                phone_no = request.POST.get('phone_no')
+                vehicle_name = request.POST.get('vehicle_name')
+                vehicle_model = request.POST.get('vehicle_model')
+                vehicle_no = request.POST.get('vehicle_no')
+                maintenance_cost = request.POST.get('maintenance_cost')
+                sale_amount = request.POST.get('sale_amount')
+                total_amount = request.POST.get('total_price')
+                discount = request.POST.get('discount')
+                final_amount = request.POST.get('net_amount')
+                paid = request.POST.get('cash') 
+                person_name = request.POST.get('person_name', None)
+                products = request.POST.getlist('products[]',None)
+                services = request.POST.getlist('services[]',None)
+                rate = request.POST.getlist('rate[]')
+                quantity = request.POST.getlist('qty[]')
+                total_product_price = request.POST.getlist('total_product_price[]')
+                srate = request.POST.getlist('srate[]')
+                squantity = request.POST.getlist('sqty[]')
+                stotal_product_price = request.POST.getlist('stotal_product_price[]')
+                # return JsonResponse({'body': request.POST}, safe=False)
+                sale = Sale(discount=discount, maintenance_cost=maintenance_cost, sale_amount=sale_amount, total_amount=total_amount,  final_amount=final_amount,phone_no=phone_no,vehicle_name=vehicle_name,vehicle_model=vehicle_model,vehicle_no=vehicle_no,customer_name=person_name, paid=paid,status=True,type='sale',description='customer')
+                sale.save()
+                payment1 = Payment(credit=0,debit=final_amount,date=sale.date,type='walking',description='sale cash out',sale_id=sale.pk, customer_name=person_name)
+                payment2 = Payment(credit=paid,debit=0,date=sale.date,type='walking',description='sale cash in',sale_id=sale.pk, customer_name=person_name)
+                payment1.save()
+                payment2.save()
                 
-            counter =  0
-            for service in services:
-                sale_detail_services = SaleDetails(sale_id=sale.pk, service_id=service, quantity=squantity[counter], rate=srate[counter])
-                sale_detail_services.save()
-                counter += 1
-                
-                
-            messages.success(request, 'Successfully Added the Sale')
-            return JsonResponse({'error': False, 'success_msg': 'added the sale', 'sale_id': sale.pk})
-            # return render(request,'admin_portal/invoice.html',{'saledetails':saledetails})
-            # return redirect('invoice')
-        
-        
-        except Exception as e:
-            return JsonResponse({'error': True, 'error_msg': str(e)})
+                counter =  0
+                for product in products:
+                    sale_detail_products = SaleDetails(sale_id=sale.pk, product_id=product, quantity=quantity[counter], rate=rate[counter])
+                    sale_detail_products.save()
+                    stock = Stock.objects.filter(product_id=product).first()
+                    if stock:
+                        stock.quantity-=int(quantity[counter])
+                        stock.save()
+                        stockoutlog = StockOutLog(type='stock out',product_id=product,quantity=int(quantity[counter]))
+                        stockoutlog.save()
+                    else:
+                        messages.error(request,"Firstly Add the Product in Database" )
+                        return redirect('add_sale')
+                    counter += 1
+                    
+                counter =  0
+                for service in services:
+                    sale_detail_services = SaleDetails(sale_id=sale.pk, service_id=service, quantity=squantity[counter], rate=srate[counter])
+                    sale_detail_services.save()
+                    counter += 1
+                    
+                messages.success(request, 'Successfully Added the Sale')
+                return JsonResponse({'error': False, 'success_msg': 'added the sale', 'sale_id': sale.pk})
+                # return render(request,'admin_portal/invoice.html',{'saledetails':saledetails})
+                # return redirect('invoice')
+            except Exception as e:
+                return JsonResponse({'error': True, 'error_msg': str(e)})
+        else:
+            return render(request, 'admin_portal/add_sale.html',{'products':products,'services':services,'persons':persons})
     else:
-        return render(request, 'admin_portal/add_sale.html',{'products':products,'services':services,'persons':persons})
+        return HttpResponse('Not accessible')
 
-from django.core.serializers import serialize
+
+@login_required
+def del_sale(request,id):
+    sale = Sale.objects.get(id=id)
+    sale.delete()
+    saleDetail = SaleDetails.objects.filter(sale_id=id)
+    saleDetail.delete()
+    payment = Payment.objects.filter(sale_id=id)
+    payment.delete()
+    messages.success(request,"Sale Deleted Successfully. \n Remember to Stock In the quantity against this Purchase!!")
+    return redirect('show_sales')
+
+@login_required
+def stockin(request):
+    products = Product.objects.all()
+    if request.method == "POST":
+        product_id = request.POST.get('selectproducts')
+        quantity = request.POST.get('quantity')
+        if product_id:
+            stock = Stock.objects.filter(product_id=product_id).first()
+            stock.quantity+=int(quantity)
+            stock.save()
+            messages.success(request,"Quantity Added To Stock Successfully!!")
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+        else:
+            messages.error(request,"First Select the Product!!")
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+    return render(request,'admin_portal/stockin.html',{'products':products})
+
+#------------------ Inoice ---------------------#
 
 @csrf_exempt
 def invoice(request, sale_id):
@@ -342,8 +403,6 @@ def invoice(request, sale_id):
     # return JsonResponse({'sale': json.loads(serialize('json', sale.sale.all() ))})
     # saledetails = SaleDetails.objects.filter(sale_id=sale.id) 
     return render(request,'admin_portal/invoice.html', {'sale': sale, 'details': saleDetails})  
-
-
 
 def load_products_price(request):
     product_id = request.GET.get('product')
@@ -361,8 +420,42 @@ def load_service_price(request):
     service = Service.objects.filter(id=service_id).first()
     return HttpResponse(service.rate)
 
+#------------------ Ledger ---------------------#
+
 @login_required
 def show_ledger(request):
-    payments = Payment.objects.all()
-    return render(request, 'admin_portal/show_ledger.html',{'payments':payments})
-  
+    if request.user.is_superuser:
+        payments = Payment.objects.all()
+        stocks = Stock.objects.filter(status=True)
+        products = Product.objects.filter(status=True)
+        total_arr = []
+        purchase_rate = []
+        quantity = []
+        total = ""
+        for item in products:
+            purchase_rate.append(int(item.purchase_rate))
+        for item in stocks:
+            quantity.append(int(item.quantity))
+        total_arr = [a * b for a, b in zip(purchase_rate, quantity)]
+        total = sum(total_arr)
+        return render(request, 'admin_portal/show_ledger.html',{'payments':payments,"total":total})
+    else:
+        return HttpResponse('Not accessible')
+    
+#------------------ Stock Log ---------------------#    
+
+def stocklog(request):
+    if request.user.is_superuser:
+        stocklogs = StockOutLog.objects.all()
+        return render(request,'admin_portal/stocklog.html',{'stocklogs':stocklogs})
+    else:
+        return HttpResponse('Not accessible')
+    
+#------------------ Purcahse Price of Stock ---------------------# 
+
+def stock_purchase_price(request):
+    if request.user.is_superuser:
+        stock_quantity = Stock.objects.filter(status=True)
+        return render(request,"admin_portal/stock_purchase_price.html",{"stock_quantity":stock_quantity})
+    else:
+        return HttpResponse('Not accessible')

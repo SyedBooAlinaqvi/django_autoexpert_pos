@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <style>
+        .register {
+            background: -webkit-linear-gradient(left, #3931af, #00c6ff);
+            margin-top: 3%;
+            padding: 3%;
+        }
+
+        .register-left {
+            text-align: center;
+            color: #fff;
+            margin-top: 4%;
+        }
+
+        .register-left input {
+            border: none;
+            border-radius: 1.5rem;
+            padding: 2%;
+            width: 60%;
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #383d41;
+            margin-top: 30%;
+            margin-bottom: 3%;
+            cursor: pointer;
+        }
+
+        .register-right {
+            background: #f8f9fa;
+            border-top-left-radius: 10% 50%;
+            border-bottom-left-radius: 10% 50%;
+        }
+
+        .register-left img {
+            margin-top: 15%;
+            margin-bottom: 5%;
+            width: 25%;
+            -webkit-animation: mover 2s infinite alternate;
+            animation: mover 1s infinite alternate;
+        }
+
+        @-webkit-keyframes mover {
+            0% {
+                transform: translateY(0);
+            }
+
+            100% {
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes mover {
+            0% {
+                transform: translateY(0);
+            }
+
+            100% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .register-left p {
+            font-weight: lighter;
+            padding: 12%;
+            margin-top: -9%;
+        }
+
+        .register .register-form {
+            padding: 10%;
+            margin-top: 5%;
+        }
+
+        .btnRegister {
+            float: right;
+            margin-top: 10%;
+            border: none;
+            border-radius: 1.5rem;
+            padding: 2%;
+            background: #0062cc;
+            color: #fff;
+            font-weight: 600;
+            width: 50%;
+            cursor: pointer;
+        }
+
+        .register .nav-tabs {
+            margin-top: 3%;
+            border: none;
+            background: #0062cc;
+            border-radius: 1.5rem;
+            width: 28%;
+            float: right;
+        }
+
+        .register .nav-tabs .nav-link {
+            padding: 2%;
+            height: 34px;
+            font-weight: 600;
+            color: #fff;
+            border-top-right-radius: 1.5rem;
+            border-bottom-right-radius: 1.5rem;
+        }
+
+        .register .nav-tabs .nav-link:hover {
+            border: none;
+        }
+
+        .register .nav-tabs .nav-link.active {
+            width: 100px;
+            color: #0062cc;
+            border: 2px solid #0062cc;
+            border-top-left-radius: 1.5rem;
+            border-bottom-left-radius: 1.5rem;
+        }
+
+        .register-heading {
+            text-align: center;
+            margin-top: 8%;
+            margin-bottom: -15%;
+            color: #495057;
+        }
+    </style>
+
+    <title>Registration</title>
+</head>
+
+<body>
+    <div class="container register">
+        <div class="row">
+            <div class="col-md-3 register-left">
+                <img src="https://image.ibb.co/n7oTvU/logo_white.png" alt="" />
+                <h3>Welcome</h3>
+                <p>You are 30 seconds away from your registration!</p>
+                {% comment %} <input  type="button" name="" href="{% url 'login' %}" value="Login" /><br /> {% endcomment %}
+            </div>
+            <div class="col-md-9 register-right">
+                <form class="form-horizontal" action="{% url 'registeration' %}" onsubmit="return validate()" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% if messages %}
+                    {% for message in messages %}
+                        <div id="alertDiv"
+                            class="alert {% if message.tags %}alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}{{ message.tags }}{% endif %}{% endif %}"
+                            role="alert">{{ message }}
+                        </div> 
+                    {% endfor %}
+                    {% endif %}
+                    <div class="row register-form">
+                        <div class="col-md-6">
+                            
+                            <div class="form-group">
+                                    <input class="form-control" name="user_name" type="text" required="" placeholder="Username" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                    <input class="form-control" type="password" name="password" required="" placeholder="Password" required>
+                            </div>
+                            <div class="form-group">
+                                    <input class="form-control" type="password" name="confirm_password" required="" placeholder="Confirm Password" required >
+                            </div>
+                            
+                            <div class="form-group p-2">
+                                <a href="#">Already has an account!</a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                    <input class="form-control" type="text" name="email" required="" placeholder="Email" required>
+                            </div>
+                            <div class="form-group">
+                                <input class="form-control" name="first_name" type="text" required="" placeholder="Firstname" required>
+                            </div>
+                            <div class="form-group">
+                                <input class="form-control" name="last_name" type="text" required="" placeholder="Lastname" required>
+                            </div>
+                            
+                            <input type="submit" class="btnRegister" value="Register" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#alertDiv').delay(3000).slideUp(1200);
+        });</script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    
+</body>
+
+</html>

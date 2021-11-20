@@ -10,7 +10,7 @@
 <div class="page-title-box">
     <div class="row align-items-center">
         <div class="col-sm-6">
-            <h4 class="page-title">AutoExpert</h4>
+            <h4 class="page-title">Sales</h4>
         </div>
         <div class="col-sm-6">
             <ol class="breadcrumb float-right">
@@ -25,7 +25,7 @@
 <div class="row">
     <div class="col-12">
             <div class="row">
-                <div class="col-sm-4 col-xl-4">
+                <div class="col-sm-3 col-xl-3">
                     <div class="card">
                         <div class="card-heading p-4">
                             <div class="mini-stat-icon float-right">
@@ -39,7 +39,7 @@
                     </div>
                 </div>
 
-                <div class="col-sm-4 col-xl-4">
+                <div class="col-sm-3 col-xl-3">
                     <div class="card">
                         <div class="card-heading p-4">
                             <div class="mini-stat-icon float-right">
@@ -53,14 +53,27 @@
                     </div>
                 </div>
 
-                <div class="col-sm-4 col-xl-4">
+                <div class="col-sm-3 col-xl-3">
                     <div class="card">
                         <div class="card-heading p-4">
                             <div class="mini-stat-icon float-right">
-                                <i class="mdi mdi-tag-text-outline bg-warning text-white"></i>
+                                <i class="fas fa-cart-plus bg-warning text-white"></i>
                             </div>
                             <div>
-                                <h5 class="font-16">Profit</h5>
+                                <h5 class="font-16">Stock Amount</h5>
+                            </div>
+                            <h3 class="mt-4" id='stock'>{{total}}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-xl-3">
+                    <div class="card">
+                        <div class="card-heading p-4">
+                            <div class="mini-stat-icon float-right">
+                                <i class="fas fa-money-bill-alt bg-danger text-white"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-16">Balance</h5>
                             </div>
                             <h3 class="mt-4" id='profit'></h3>
                         </div>
@@ -150,18 +163,23 @@
         var total = $('#datatable').DataTable().column(3).data().sum();
         $('#debit').html(total);
         $('#credit').html(sum);
+        var stock = $("#stock").html()
+        var profit = (sum+parseInt(stock)-total);
+        $('#profit').html(profit);
+
+    });
+
+    {% comment %} var table = $("#datatable").DataTable();
+    $("#datatable").on('search.dt', function() {
+        var sum = $('#datatable').DataTable().column(2,{"filter": "applied"}).data().sum();
+        var total = $('#datatable').DataTable().column(3,{"filter": "applied"}).data().sum();
+        $('#debit').html(total);
+        $('#credit').html(sum);
         console.log('total',total)
         console.log('sum',sum)
         var profit = total - sum;
         $('#profit').html(profit);
-
-    });
-    
-    
-    $(document).ready(function() {
-        
-    });
-    
+}); {% endcomment %}
 
 
 </script>

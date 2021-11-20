@@ -24,6 +24,39 @@
 <!-- end page-title -->
 <div class="row">
     <div class="col-12">
+
+        <div class="row">
+            <div class="col-sm-6 col-xl-6">
+                <div class="card">
+                    <div class="card-heading p-4">
+                        <div class="mini-stat-icon float-right">
+                            <i class="fas fa-money-check-alt bg-primary  text-white"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-16">Total Amount</h5>
+                        </div>
+                        <h3 class="mt-4" id="credit"></h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-xl-6">
+                <div class="card">
+                    <div class="card-heading p-4">
+                        <div class="mini-stat-icon float-right">
+                            <i class="fas fa-search-dollar bg-success text-white"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-16">Paid Amount</h5>
+                        </div>
+                        <h3 class="mt-4" id="debit"></h3>
+                    </div>
+                </div>
+            </div>
+
+            
+        </div>
+
         <div class="card m-30">
             <div class="card-body">
             {% if messages %}
@@ -42,11 +75,11 @@
                             <th>Person</th>
                             <th>Phone</th>
                             <th>Vehicle</th>
-                            <th>VehicleModel</th>
                             <th>VehicleNo.</th>
                             <th>TotalAmount</th>
                             <th>PaidAmount</th>
                             <th>Date</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -56,11 +89,17 @@
                             <td>{{ sale.customer_name }}</td>
                             <td>{{ sale.phone_no }}</td>
                             <td>{{ sale.vehicle_name }}</td>
-                            <td>{{ sale.vehicle_model }}</td>
                             <td>{{ sale.vehicle_no }}</td>
                             <td>{{ sale.total_amount }}</td>
                             <td>{{ sale.paid }}</td>
                             <td>{{ sale.date }}</td>
+                            <td>
+                            <div style="text-align: center;">
+                                <a href="{% url 'del_sale' id=sale.id %}" class="btn btn-outline-danger btn-sm waves-effect waves-light" style="width: 30px;">
+                                    <i class="fa fa-trash fa-lg"></i>
+                                </a>
+                            </div>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -96,4 +135,27 @@
         $('#alertDiv').delay(3000).slideUp(1200);
     });
 </script>
+<script src="https://cdn.datatables.net/plug-ins/1.10.19/api/sum().js"></script>
+<script>
+
+    $(document).ready(function() {
+        var sum = $('#datatable').DataTable().column(5,{"filter": "applied"}).data().sum();
+        var total = $('#datatable').DataTable().column(6,{"filter": "applied"}).data().sum();
+        $('#debit').html(total);
+        $('#credit').html(sum);
+
+    });
+    
+    var table = $("#datatable").DataTable();
+    $("#datatable").on('search.dt', function() {
+        var sum = $('#datatable').DataTable().column(5,{"filter": "applied"}).data().sum();
+        var total = $('#datatable').DataTable().column(6,{"filter": "applied"}).data().sum();
+        $('#debit').html(total);
+        $('#credit').html(sum);
+
+});
+
+
+</script>
+
 {% endblock %}

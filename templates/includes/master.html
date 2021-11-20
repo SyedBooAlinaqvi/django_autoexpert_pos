@@ -64,7 +64,7 @@
                         <div class="dropdown notification-list nav-pro-img">
                             <a class="dropdown-toggle nav-link arrow-none nav-user" data-toggle="dropdown" href="#"
                                 role="button" aria-haspopup="false" aria-expanded="false">
-                                <img src="{% static '/images/users/user-4.png' %}" alt="user" class="rounded-circle">
+                                <img src="{% static '/images/users/user-4.jpg' %}" alt="user" class="rounded-circle">
                             </a>
                             <div class="dropdown-menu dropdown-menu-right profile-dropdown ">
                                 <a class="dropdown-item text-danger" href="{% url 'logout' %}"><i
@@ -96,47 +96,79 @@
                 <!--- Sidemenu -->
                 <div id="sidebar-menu">
                     <!-- Left Menu Start -->
+                    {% if user.is_authenticated %}
+                    {% if user.is_superuser %}
                     <ul class="metismenu" id="side-menu">
-                        <li class="menu-title">Sales</li>
+                        <li class="menu-title">Menu</li>
+
                         <li>
                             <a href="{% url 'show_sales' %}" class="waves-effect"><i class="fas fa-wallet"></i>
                                 <span>
-                                    Sale's List <span class="float-right menu-arrow"></span> </span> </a>
+                                    Sales <span class="float-right menu-arrow"></span> </span> </a>
                         </li>
-                        <li class="menu-title">Services</li>
                         <li>
                             <a href="{% url 'show_services' %}" class="waves-effect"><i class="icon-pencil-ruler"></i>
                                 <span>
-                                    Service's List <span class="float-right menu-arrow"></span> </span> </a>
+                                    Services <span class="float-right menu-arrow"></span> </span> </a>
                         </li>
-                        <li class="menu-title">Product</li>
                         <li>
                             <a href="{% url 'show_products' %}" class="waves-effect"><i class="fas fa-sitemap"></i>
                                 <span>
-                                    Product's List <span class="float-right menu-arrow"></span> </span> </a>
+                                    Products <span class="float-right menu-arrow"></span> </span> </a>
                         </li>
-                        <li class="menu-title">Person</li>
                         <li>
                             <a href="{% url 'show_persons' %}" class="waves-effect"><i class="fas fa-users"></i>
                                 <span>
-                                    Person's List <span class="float-right menu-arrow"></span> </span> </a>
+                                    Persons <span class="float-right menu-arrow"></span> </span> </a>
                         </li>
-                        <li class="menu-title">Purchases</li>
                         <li>
                             <a href="{% url 'show_purchases' %}" class="waves-effect"><i class="fas fa-cart-plus"></i>
                                 <span>
-                                    Purchase's List <span class="float-right menu-arrow"></span> </span> </a>
+                                    Purchases <span class="float-right menu-arrow"></span> </span> </a>
                         </li>
                         
-                        <li class="menu-title">Records</li>
                         <li>
                             <a href="{% url 'show_ledger' %}" class="waves-effect"><i class="fas fa-cash-register"></i>
                                 <span>
                                     Ledger <span class="float-right menu-arrow"></span> </span> </a>
                         </li>
-                        
-                        
+                        <li>
+                            <a href="{% url 'stocklog' %}" class="waves-effect"><i class="fas fa-list"></i>
+                                <span>
+                                    StockLog <span class="float-right menu-arrow"></span> </span> </a>
+                        </li>
                     </ul>
+                    {% else %}
+                    <ul class="metismenu" id="side-menu">
+                        <li class="menu-title">Menu</li>
+                        <li>
+                            <a href="{% url 'c_show_sales' %}" class="waves-effect"><i class="fas fa-wallet"></i>
+                                <span>
+                                    Sales <span class="float-right menu-arrow"></span> </span> </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'c_show_services' %}" class="waves-effect"><i class="icon-pencil-ruler"></i>
+                                <span>
+                                    Services <span class="float-right menu-arrow"></span> </span> </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'c_show_products' %}" class="waves-effect"><i class="fas fa-sitemap"></i>
+                                <span>
+                                    Products <span class="float-right menu-arrow"></span> </span> </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'c_show_persons' %}" class="waves-effect"><i class="fas fa-users"></i>
+                                <span>
+                                    Persons <span class="float-right menu-arrow"></span> </span> </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'c_show_purchases' %}" class="waves-effect"><i class="fas fa-cart-plus"></i>
+                                <span>
+                                    Purchases <span class="float-right menu-arrow"></span> </span> </a>
+                        </li>
+                    </ul>
+                    {% endif %}
+                    {% endif %}
 
                 </div>
                 <!-- Sidebar -->

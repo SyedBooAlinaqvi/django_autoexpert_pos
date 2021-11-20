@@ -15,9 +15,11 @@ urlpatterns = [
     path('add_product', views.add_product, name='add_product'),
     path('update_product/<int:pk>', views.update_product, name='update_product'),
     path('del_product/<int:pk>', views.del_product, name='del_product'),
+    
     path('show_persons', views.show_persons, name='show_persons'),
     path('add_person', views.add_person, name='add_person'),
     path('update_person/<int:pk>', views.update_person, name='update_person'),
+    
     path('show_purchases', views.show_purchases, name='show_purchases'),
     path('add_purchase', views.add_purchase, name='add_purchase'),
     path('load_product_by_id', views.load_product_by_id, name='load_product_by_id'),
@@ -28,4 +30,9 @@ urlpatterns = [
     path('load_service_price', views.load_service_price, name='load_service_price'),
     path('show_ledger', views.show_ledger, name='show_ledger'),
     path('invoice/<sale_id>', views.invoice, name='invoice'),
+    path('stockout', views.stockout, name='stockout'),
+    path('stockin', views.stockin, name='stockin'),
+    path('stocklog', views.stocklog, name='stocklog'),
+    path('del_sale/<int:id>', views.del_sale, name='del_sale'),
+    path('del_purchase/<int:id>', views.del_purchase, name='del_purchase'),
 ]

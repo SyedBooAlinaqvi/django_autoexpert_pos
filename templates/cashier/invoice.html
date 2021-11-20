@@ -31,10 +31,7 @@
                 </div>
                 <!-- end page-title -->
 
-                {% comment %} <h3 class="m-t-0">
-                    <img src="{% static '/images/logo-dark.png' %}" alt="logo" height="40"/>
-                </h3> {% endcomment %}
-                <div class="row">
+                <div class="row mr-2">
                     <div class="col-6">
                         <div class="card m-b-30">
                             <div class="card-body">
@@ -77,7 +74,7 @@
                                     <div class="col-12">
                                         <div class="panel panel-default">
                                             <div class="p-2">
-                                                <h3 class="panel-title font-20"><strong><b>Order summary</b> </strong></h3>
+                                                <h3 class="panel-title font-20"><strong>Order summary</strong></h3>
                                             </div>
                                             <div class="">
                                                 <div class="table-responsive">
@@ -108,20 +105,10 @@
                                                                 <td class="no-line"></td>
                                                                 <td class="no-line"></td>
                                                                 <td class="thick-line text-center">
-                                                                    <strong>Discount</strong>
-                                                                </td>
-                                                                <td class="no-line text-right">
-                                                                    <h6 class="text-center m-0">{{ sale.discount }}</h6>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="no-line"></td>
-                                                                <td class="no-line"></td>
-                                                                <td class="thick-line text-center">
                                                                     <strong>Total</strong>
                                                                 </td>
                                                                 <td class="no-line text-right">
-                                                                    <h4 class="text-center m-0">{{ sale.paid }}</h4>
+                                                                    <h4 class="text-center m-0">{{ sale.total_amount }}</h4>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -131,9 +118,9 @@
 
                                                 <div class="d-print-none mo-mt-5"><br>
                                                     <div class="float-right mr-4">
-                                                        <button onclick="window.print()"
+                                                        <a href="javascript:window.print()"
                                                             class="btn btn-success waves-effect waves-light"><i class="fa fa-print"></i>
-                                                        </button>
+                                                        </a>
                                                     </div>
                                                 </div><br><br>
                                                 <center>
@@ -152,7 +139,7 @@
                     </div> <!-- end col -->
                     <div class="col-6"></div>
 
-                </div> <!-- end row --> 
+                </div> <!-- end row -->
 
 
             </div>
